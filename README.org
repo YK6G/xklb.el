@@ -1,0 +1,29 @@
+* xklb.el
+在Emacs中使用星空两笔单字输入法
+
+** 说明
+
+  在 Emacs 中使用星空两笔单字输入法，主要是使用 emacs-rime ， 依赖 librime 。
+  xklb.el 将 Rime 的星二单的词库转为 elisp 的数据结构，可以无外部依赖直接使用。
+  
+** 使用方法
+
+#+begin_src elisp
+  (load "/path/to/xklb.el")
+
+  ;; 设置星二单的 Rime 词典路径
+  (setq xklb-dictionary "/path/to/xklbdz.dict.yaml")
+
+  ;; 设置转换的词典文件路径 
+  ;; (setq xklb-cache-file
+  ;;   (expand-file-name "xklb-dict.el" user-emacs-directory))
+
+  ;; 可选 保存转换的词典文件 
+  (xklb-make-cache)
+
+  ;; 载入星二
+  (xklb-setup)
+
+  ;; (setq default-input-method "star2c")
+#+end_src
+
