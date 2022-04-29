@@ -24,6 +24,6 @@
   ;; 载入星二
   (xklb-setup)
 
-  ;; (setq default-input-method "star2c")
+  ;; (setq default-input-method "xklb")
 #+end_src
 
