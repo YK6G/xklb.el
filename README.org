@@ -13,12 +13,17 @@
   ;; 设置星二单的 Rime 词典路径
   (setq xklb-dictionary "/path/to/xklbdz.dict.yaml")
 
-  ;; 设置转换的词典文件路径 
+  ;; 设置转换的词典文件路径 (以下为默认)
   ;; (setq xklb-cache-file
   ;;   (expand-file-name "xklb-dict.el" user-emacs-directory))
 
-  ;; 可选 保存转换的词典文件 
-  (xklb-make-cache)
+  ;; 保存转换的词典文件 加快载入速度 只需生成一次 
+  ;; (xklb-make-cache)
+
+  ;; 设置自定义规则 (以下为默认)
+  ;; (setq xklb-user-dictionary
+  ;;  '(("," . "，")
+  ;;    ("." . "。")))
 
   ;; 载入星二
   (xklb-setup)
