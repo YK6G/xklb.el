@@ -30,7 +30,7 @@
 
 星空两笔输入法目前没有官方的 Rime 支持，找到的词典大多是个人修改版。
 
-不过，官方有维护 [[https://github.com/xkinput/xxxk][小小星空]] 项目，我们可以将其中的词典文件转换为 Rime 格试。
+不过，官方有维护 [[https://github.com/xkinput/xxxk][小小星空]] 项目，我们可以将其中的词典文件转换为 Rime 格式。
 
 #+begin_src sh
   chmod +x xxxk2rime.el
