@@ -9,6 +9,10 @@
 (defvar xklb-cache-file
   (expand-file-name "xklb-dict.el" user-emacs-directory))
 
+(defvar xklb-punctuation
+  '(("," "，")
+    ("." "。")))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; data struct
 (defsubst xklb--make-codetree (code trans)
@@ -31,14 +35,14 @@
 
 (defun xklb--insert-trans (codetree trans)
   (xklb--set-trans codetree
-	   (vconcat (xklb--get-trans codetree) trans)))
+		   (vconcat (xklb--get-trans codetree) trans)))
 
 (defun xklb--query-tree (codetree codelist)
   (when-let* ((code (car codelist))
-	    (entry (xklb--get-subtree codetree code)))
+	      (entry (xklb--get-subtree codetree code)))
     (let ((rest (cdr codelist)))
       (if (null rest)
-	entry
+	  entry
 	(xklb--query-tree entry rest)))))
 
 (defun xklb--mapc-tree (codetree function)
@@ -53,45 +57,45 @@
 	(entry (xklb--get-subtree codetree (car codelist)))
 	(rest (cdr codelist)))
     (cond ((and entry rest)       ;; continue
-	 (xklb-defrule entry rest trans))
-	((and entry (null rest))  ;; insert
-	 (xklb--insert-trans entry trans))
-	((and (null entry) rest)  ;; make a new tree and continue
-	 (let ((new-tree (xklb--make-codetree code '())))
-	   (xklb--insert-tree codetree new-tree)
-	   (xklb-defrule new-tree rest trans)))
-	((null (and entry rest))  ;; make a new tree
-	 (xklb--insert-tree
-	  codetree
-	  (xklb--make-codetree code trans))))))
+	   (xklb-defrule entry rest trans))
+	  ((and entry (null rest))  ;; insert
+	   (xklb--insert-trans entry trans))
+	  ((and (null entry) rest)  ;; make a new tree and continue
+	   (let ((new-tree (xklb--make-codetree code '())))
+	     (xklb--insert-tree codetree new-tree)
+	     (xklb-defrule new-tree rest trans)))
+	  ((null (and entry rest))  ;; make a new tree
+	   (xklb--insert-tree
+	    codetree
+	    (xklb--make-codetree code trans))))))
 
 (defun xklb--gen-guidance (codetree)
   (mapc (lambda (code)
-	(when-let* ((tree (xklb--get-subtree codetree code))
-		    (trans (xklb--get-trans tree))
-		    (ch (aref trans 0)))
-	  (xklb--insert-trans codetree (vector ch))))
+	  (when-let* ((tree (xklb--get-subtree codetree code))
+		      (trans (xklb--get-trans tree))
+		      (ch (aref trans 0)))
+	    (xklb--insert-trans codetree (vector ch))))
 	"aeiou"))
 
 (defun xklb--read-dict (file)
   "Read dictionary file."
   (with-temp-buffer
     (insert-file-contents file)
-    (seq-filter (lambda (x)
-		(and (length> x 2)
-		     (eq (elt x 1) ?\t)))
-		(split-string (buffer-string) "\n"))))
+    (mapcar
+     (lambda (line)
+       (let ((c (split-string line)))
+	 (cons (string-to-list (cadr c))
+	       (vector (car c)))))
+     (seq-filter (lambda (x)
+		   (and (length> x 2)
+			(eq (elt x 1) ?\t)))
+		 (split-string (buffer-string) "\n")))))
 
 (defun xklb--build-tree (file)
-  (let ((rules (mapcar
-		(lambda (line)
-		(let ((c (split-string line)))
-		  (cons (string-to-list (cadr c))
-			(vector (car c)))))
-		(xklb--read-dict file)))
+  (let ((rules (xklb--read-dict file))
 	(tree (xklb--make-codetree nil nil)))
     (mapc (lambda (x) (xklb-defrule tree (car x) (cdr x)))
-	rules)
+	  rules)
     ;; build guiance
     (xklb--mapc-tree tree #'xklb--gen-guidance)
     tree))
@@ -104,8 +108,8 @@
   (if (file-exists-p xklb-cache-file)
       (quail-install-map
        (with-temp-buffer
-	(insert-file-contents xklb-cache-file)
-	(read (current-buffer))))
+	 (insert-file-contents xklb-cache-file)
+	 (read (current-buffer))))
     (quail-install-map
      (cons nil (cddr (xklb--build-tree (or file xklb-dictionary)))) "xklb")))
 
