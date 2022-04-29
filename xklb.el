@@ -9,9 +9,9 @@
 (defvar xklb-cache-file
   (expand-file-name "xklb-dict.el" user-emacs-directory))
 
-(defvar xklb-punctuation
-  '(("," "，")
-    ("." "。")))
+(defvar xklb-user-dictionary
+  '(("," . "，")
+    ("." . "。")))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; data struct
@@ -111,12 +111,16 @@
 	 (insert-file-contents xklb-cache-file)
 	 (read (current-buffer))))
     (quail-install-map
-     (cons nil (cddr (xklb--build-tree (or file xklb-dictionary)))) "xklb")))
+     (cons nil (cddr (xklb--build-tree (or file xklb-dictionary)))) "xklb"))
+  (mapc (lambda (r) (quail-defrule (car r) (cdr r)))
+	xklb-user-dictionary)
+  t)
 
 (defun xklb-make-cache ()
   (with-temp-file xklb-cache-file
     (prin1
      (cons nil (cddr (xklb--build-tree xklb-dictionary)))
-     (current-buffer))))
+     (current-buffer)))
+  t)
 
 (provide 'xklb)
