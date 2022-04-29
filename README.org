@@ -3,8 +3,7 @@
 
 ** 说明
 
-  在 Emacs 中使用星空两笔单字输入法，主要是使用 emacs-rime ， 依赖 librime 。
-  xklb.el 将 Rime 的星二单的词库转为 elisp 的数据结构，可以无外部依赖直接使用。
+  xklb.el 将 Rime 的星二单的词库转为 elisp ，可以无外部依赖使用。
   
 ** 使用方法
 
@@ -27,3 +26,16 @@
   ;; (setq default-input-method "xklb")
 #+end_src
 
+** 获取词典
+
+星空两笔输入法目前没有官方的 Rime 支持，找到的词典大多是个人修改版。
+
+不过，官方有维护 [[https://github.com/xkinput/xxxk][小小星空]] 项目，我们可以将其中的词典文件转换为 Rime 格试。
+
+#+begin_src sh
+  chmod +x xxxk2rime.el
+
+  curl -O https://raw.githubusercontent.com/xkinput/xxxk/master/xxxk-schema-xklb/mb/xklb/xklb_arg.txt
+
+  ./xxxk2rime.el xklb_arg.txt > xklbdz.dict.yaml
+#+end_src

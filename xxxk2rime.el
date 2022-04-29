@@ -29,7 +29,7 @@
                (let ((line (split-string x)))
                  (and (length= line 2)
                       (length< (car line) 7)
-                      (length< (cadr line) 2)))))
+                      (length= (cadr line) 1)))))
         (split-string (buffer-string) "\n"))))))
 
 (princ "# Rime dictionary\n")
