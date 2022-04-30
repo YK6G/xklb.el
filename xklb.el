@@ -48,13 +48,13 @@
 	(entry (xklb--get-subtree codetree (car codelist)))
 	(rest (cdr codelist)))
     (cond ((and entry rest)         ;; continue
-	   (xklb-defrule entry rest trans))
+	   (xklb--defrule entry rest trans))
 	  ((and entry (null rest))  ;; insert
 	   (xklb--insert-trans entry trans))
 	  ((and (null entry) rest)  ;; make a new tree and continue
 	   (let ((new-tree (xklb--make-codetree code '())))
 	     (xklb--insert-tree codetree new-tree)
-	     (xklb-defrule new-tree rest trans)))
+	     (xklb--defrule new-tree rest trans)))
 	  ((null (and entry rest))  ;; make a new tree
 	   (xklb--insert-tree
 	    codetree
