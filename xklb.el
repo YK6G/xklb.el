@@ -2,6 +2,7 @@
 
 (require 'quail)
 (require 'seq)
+(require 'subr-x)
 
 (defvar xklb-dictionary
   (expand-file-name "xklbdz.dict.yaml" user-emacs-directory))
