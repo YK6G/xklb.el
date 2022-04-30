@@ -1,7 +1,6 @@
 ;; -*- lexical-binding: t; -*-
 
 (require 'quail)
-(require 'subr-x)
 (require 'seq)
 
 (defvar xklb-dictionary
@@ -35,15 +34,7 @@
 
 (defun xklb--insert-trans (codetree trans)
   (xklb--set-trans codetree
-		   (vconcat (xklb--get-trans codetree) trans)))
-
-(defun xklb--query-tree (codetree codelist)
-  (when-let* ((code (car codelist))
-	      (entry (xklb--get-subtree codetree code)))
-    (let ((rest (cdr codelist)))
-      (if (null rest)
-	  entry
-	(xklb--query-tree entry rest)))))
+		   (vconcat (xklb--get-trans codetree) trans))) 
 
 (defun xklb--mapc-tree (codetree function)
   (funcall function codetree)
@@ -52,11 +43,11 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defun xklb-defrule (codetree codelist trans)
+(defun xklb--defrule (codetree codelist trans)
   (let ((code (car codelist))
 	(entry (xklb--get-subtree codetree (car codelist)))
 	(rest (cdr codelist)))
-    (cond ((and entry rest)       ;; continue
+    (cond ((and entry rest)         ;; continue
 	   (xklb-defrule entry rest trans))
 	  ((and entry (null rest))  ;; insert
 	   (xklb--insert-trans entry trans))
@@ -68,6 +59,16 @@
 	   (xklb--insert-tree
 	    codetree
 	    (xklb--make-codetree code trans))))))
+
+(defun xklb--exist-p (codetree codelist trans)
+  (let ((code (car codelist))
+	(entry (xklb--get-subtree codetree (car codelist)))
+	(rest (cdr codelist)))
+    (when entry
+      (if (seq-find (lambda (x) (equal x (elt trans 0)))
+		    (xklb--get-trans entry))
+	t
+	(and rest (xklb--exist-p entry rest trans))))))
 
 (defun xklb--gen-guidance (codetree)
   (mapc (lambda (code)
@@ -94,13 +95,19 @@
 (defun xklb--build-tree (file)
   (let ((rules (xklb--read-dict file))
 	(tree (xklb--make-codetree nil nil)))
-    (mapc (lambda (x) (xklb-defrule tree (car x) (cdr x)))
-	  rules)
+    (dolist (ru rules)
+      (let ((codelist (car ru))
+	    (trans (cdr ru)))
+	(if (length= codelist 6)
+	    (unless (xklb--exist-p tree codelist trans)
+	      (xklb--defrule tree codelist trans))
+	  (xklb--defrule tree codelist trans))))
     ;; build guiance
     (xklb--mapc-tree tree #'xklb--gen-guidance)
     tree))
 
 (defun xklb-setup (&optional file)
+  (interactive)
   (quail-define-package
    "xklb" "chinese" "星" t
    "星空两笔输入法。"
@@ -117,6 +124,7 @@
   t)
 
 (defun xklb-make-cache ()
+  (interactive)
   (with-temp-file xklb-cache-file
     (prin1
      (cons nil (cddr (xklb--build-tree xklb-dictionary)))
