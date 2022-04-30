@@ -67,7 +67,7 @@
     (when entry
       (if (seq-find (lambda (x) (equal x (elt trans 0)))
 		    (xklb--get-trans entry))
-	t
+	  t
 	(and rest (xklb--exist-p entry rest trans))))))
 
 (defun xklb--gen-guidance (codetree)

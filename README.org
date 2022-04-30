@@ -44,3 +44,18 @@
 
   ./xxxk2rime.el xklb_arg.txt > xklbdz.dict.yaml
 #+end_src
+
+** 模式编辑
+
+使用模式编辑时，需要自动开关输入法。以 meow 为例。
+
+#+begin_src emacs-lisp
+  ;; 退出插入模式时关闭输入法
+  (defadvice meow-insert-exit (after ad-meow-exit activate)
+    (if current-input-method (deactivate-input-method)))
+
+  ;; 打开输入法时进入插入模式
+  (defadvice activate-input-method (after ad-meow-inerst activate)
+    (if (meow-normal-mode-p) (meow-insert)))
+#+end_src
+
